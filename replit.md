@@ -48,6 +48,36 @@ Every package extends `tsconfig.base.json` which sets `composite: true`. The roo
 - `pnpm run build` — runs `typecheck` first, then recursively runs `build` in all packages that define it
 - `pnpm run typecheck` — runs `tsc --build --emitDeclarationOnly` using project references
 
+## Pamir Connect Backend
+
+Social network API for Pamir/Sarykol youth community.
+
+### API Endpoints
+
+All routes are prefixed with `/api`:
+
+- `GET/POST /profiles` — user profiles
+- `GET/PATCH /profiles/:id` — single profile
+- `GET/POST /posts` — feed posts
+- `GET/DELETE /posts/:id` — single post
+- `POST/DELETE /posts/:id/likes` — like/unlike a post
+- `GET/POST /posts/:id/comments` — post comments
+- `GET/POST /groups` — community groups
+- `GET /groups/:id` — single group
+- `POST/DELETE /groups/:id/join` — join/leave group
+- `GET/POST /events` — events
+- `GET /events/:id` — single event
+- `POST/DELETE /events/:id/participate` — participate/cancel
+- `GET/POST /threads` — chat threads (pass `?userId=<id>`)
+- `GET/POST /threads/:id/messages` — messages in a thread
+- `GET /notifications` — notifications (pass `?userId=<id>`)
+- `PATCH /notifications/:id/read` — mark as read
+- `POST /seed` — seed demo data
+
+### Database Schema
+
+Tables: `profiles`, `posts`, `comments`, `likes`, `groups`, `group_members`, `events`, `event_participants`, `chat_threads`, `messages`, `notifications`
+
 ## Packages
 
 ### `artifacts/api-server` (`@workspace/api-server`)

@@ -1,22 +1,33 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
+  description: Pamir Connect API
 servers:
   - url: /api
     description: Base API path
 tags:
   - name: health
     description: Health operations
+  - name: profiles
+    description: User profile operations
+  - name: posts
+    description: Posts and feed operations
+  - name: groups
+    description: Community groups
+  - name: events
+    description: Events
+  - name: messages
+    description: Messages and chat threads
+  - name: notifications
+    description: Notifications
+
 paths:
   /healthz:
     get:
       operationId: healthCheck
       tags: [health]
       summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
@@ -24,6 +35,686 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/HealthStatus"
+
+  /profiles:
+    get:
+      operationId: getProfiles
+      tags: [profiles]
+      summary: Get all profiles
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of profiles
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/UserProfile"
+    post:
+      operationId: createProfile
+      tags: [profiles]
+      summary: Create a profile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateProfileInput"
+      responses:
+        "201":
+          description: Created profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+
+  /profiles/{id}:
+    get:
+      operationId: getProfile
+      tags: [profiles]
+      summary: Get profile by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    patch:
+      operationId: updateProfile
+      tags: [profiles]
+      summary: Update a profile
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateProfileInput"
+      responses:
+        "200":
+          description: Updated profile
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UserProfile"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /posts:
+    get:
+      operationId: getPosts
+      tags: [posts]
+      summary: Get all posts (feed)
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: string
+        - name: groupId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of posts
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Post"
+    post:
+      operationId: createPost
+      tags: [posts]
+      summary: Create a post
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreatePostInput"
+      responses:
+        "201":
+          description: Created post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+
+  /posts/{id}:
+    get:
+      operationId: getPost
+      tags: [posts]
+      summary: Get a post by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Post
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Post"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+    delete:
+      operationId: deletePost
+      tags: [posts]
+      summary: Delete a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Deleted
+
+  /posts/{id}/likes:
+    post:
+      operationId: likePost
+      tags: [posts]
+      summary: Like a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LikeInput"
+      responses:
+        "200":
+          description: Like result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LikeResult"
+    delete:
+      operationId: unlikePost
+      tags: [posts]
+      summary: Unlike a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LikeInput"
+      responses:
+        "200":
+          description: Unlike result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/LikeResult"
+
+  /posts/{id}/comments:
+    get:
+      operationId: getComments
+      tags: [posts]
+      summary: Get comments for a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of comments
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Comment"
+    post:
+      operationId: createComment
+      tags: [posts]
+      summary: Add a comment to a post
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateCommentInput"
+      responses:
+        "201":
+          description: Created comment
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Comment"
+
+  /groups:
+    get:
+      operationId: getGroups
+      tags: [groups]
+      summary: Get all groups
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: string
+        - name: search
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of groups
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Group"
+    post:
+      operationId: createGroup
+      tags: [groups]
+      summary: Create a group
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateGroupInput"
+      responses:
+        "201":
+          description: Created group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+
+  /groups/{id}:
+    get:
+      operationId: getGroup
+      tags: [groups]
+      summary: Get a group by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Group
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /groups/{id}/join:
+    post:
+      operationId: joinGroup
+      tags: [groups]
+      summary: Join a group
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinInput"
+      responses:
+        "200":
+          description: Join result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+    delete:
+      operationId: leaveGroup
+      tags: [groups]
+      summary: Leave a group
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinInput"
+      responses:
+        "200":
+          description: Leave result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Group"
+
+  /events:
+    get:
+      operationId: getEvents
+      tags: [events]
+      summary: Get all events
+      parameters:
+        - name: userId
+          in: query
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of events
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Event"
+    post:
+      operationId: createEvent
+      tags: [events]
+      summary: Create an event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateEventInput"
+      responses:
+        "201":
+          description: Created event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+
+  /events/{id}:
+    get:
+      operationId: getEvent
+      tags: [events]
+      summary: Get an event by ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: userId
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Event
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /events/{id}/participate:
+    post:
+      operationId: participateInEvent
+      tags: [events]
+      summary: Participate in an event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinInput"
+      responses:
+        "200":
+          description: Participate result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+    delete:
+      operationId: cancelParticipation
+      tags: [events]
+      summary: Cancel participation in an event
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/JoinInput"
+      responses:
+        "200":
+          description: Cancel result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Event"
+
+  /threads:
+    get:
+      operationId: getChatThreads
+      tags: [messages]
+      summary: Get chat threads for a user
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of chat threads
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ChatThread"
+    post:
+      operationId: createChatThread
+      tags: [messages]
+      summary: Create or get a chat thread between two users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateThreadInput"
+      responses:
+        "200":
+          description: Chat thread
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ChatThread"
+
+  /threads/{id}/messages:
+    get:
+      operationId: getMessages
+      tags: [messages]
+      summary: Get messages in a thread
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 50
+        - name: offset
+          in: query
+          schema:
+            type: integer
+            default: 0
+      responses:
+        "200":
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Message"
+    post:
+      operationId: sendMessage
+      tags: [messages]
+      summary: Send a message in a thread
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SendMessageInput"
+      responses:
+        "201":
+          description: Sent message
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Message"
+
+  /notifications:
+    get:
+      operationId: getNotifications
+      tags: [notifications]
+      summary: Get notifications for a user
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: List of notifications
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notification"
+
+  /notifications/{id}/read:
+    patch:
+      operationId: markNotificationRead
+      tags: [notifications]
+      summary: Mark a notification as read
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Updated notification
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Notification"
+
+  /seed:
+    post:
+      operationId: seedDatabase
+      tags: [health]
+      summary: Seed database with demo data
+      responses:
+        "200":
+          description: Seeded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthStatus"
+
 components:
   schemas:
     HealthStatus:
@@ -34,3 +725,373 @@ components:
       required:
         - status
 
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string
+      required:
+        - error
+
+    UserProfile:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        avatarUrl:
+          type: string
+          nullable: true
+        institution:
+          type: string
+          nullable: true
+        city:
+          type: string
+          nullable: true
+        bio:
+          type: string
+          nullable: true
+        badge:
+          type: string
+          nullable: true
+        rating:
+          type: integer
+        createdAt:
+          type: string
+        updatedAt:
+          type: string
+      required:
+        - id
+        - name
+        - rating
+        - createdAt
+        - updatedAt
+
+    CreateProfileInput:
+      type: object
+      properties:
+        name:
+          type: string
+        avatarUrl:
+          type: string
+        institution:
+          type: string
+        city:
+          type: string
+        bio:
+          type: string
+        badge:
+          type: string
+      required:
+        - name
+
+    UpdateProfileInput:
+      type: object
+      properties:
+        name:
+          type: string
+        avatarUrl:
+          type: string
+        institution:
+          type: string
+        city:
+          type: string
+        bio:
+          type: string
+        badge:
+          type: string
+        rating:
+          type: integer
+
+    Post:
+      type: object
+      properties:
+        id:
+          type: string
+        author:
+          $ref: "#/components/schemas/UserProfile"
+        content:
+          type: string
+        imageUrl:
+          type: string
+          nullable: true
+        groupId:
+          type: string
+          nullable: true
+        likes:
+          type: integer
+        liked:
+          type: boolean
+        comments:
+          type: array
+          items:
+            $ref: "#/components/schemas/Comment"
+        createdAt:
+          type: string
+      required:
+        - id
+        - author
+        - content
+        - likes
+        - liked
+        - comments
+        - createdAt
+
+    CreatePostInput:
+      type: object
+      properties:
+        authorId:
+          type: string
+        content:
+          type: string
+        imageUrl:
+          type: string
+        groupId:
+          type: string
+      required:
+        - authorId
+        - content
+
+    Comment:
+      type: object
+      properties:
+        id:
+          type: string
+        author:
+          $ref: "#/components/schemas/UserProfile"
+        text:
+          type: string
+        createdAt:
+          type: string
+      required:
+        - id
+        - author
+        - text
+        - createdAt
+
+    CreateCommentInput:
+      type: object
+      properties:
+        authorId:
+          type: string
+        text:
+          type: string
+      required:
+        - authorId
+        - text
+
+    LikeInput:
+      type: object
+      properties:
+        userId:
+          type: string
+      required:
+        - userId
+
+    LikeResult:
+      type: object
+      properties:
+        likes:
+          type: integer
+        liked:
+          type: boolean
+      required:
+        - likes
+        - liked
+
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+          nullable: true
+        coverUrl:
+          type: string
+          nullable: true
+        memberCount:
+          type: integer
+        joined:
+          type: boolean
+        createdBy:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - name
+        - memberCount
+        - joined
+        - createdAt
+
+    CreateGroupInput:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        coverUrl:
+          type: string
+        createdBy:
+          type: string
+      required:
+        - name
+
+    Event:
+      type: object
+      properties:
+        id:
+          type: string
+        title:
+          type: string
+        description:
+          type: string
+          nullable: true
+        date:
+          type: string
+        location:
+          type: string
+          nullable: true
+        coverUrl:
+          type: string
+          nullable: true
+        participantCount:
+          type: integer
+        participating:
+          type: boolean
+        createdBy:
+          type: string
+          nullable: true
+        createdAt:
+          type: string
+      required:
+        - id
+        - title
+        - date
+        - participantCount
+        - participating
+        - createdAt
+
+    CreateEventInput:
+      type: object
+      properties:
+        title:
+          type: string
+        description:
+          type: string
+        date:
+          type: string
+        location:
+          type: string
+        coverUrl:
+          type: string
+        createdBy:
+          type: string
+      required:
+        - title
+        - date
+
+    JoinInput:
+      type: object
+      properties:
+        userId:
+          type: string
+      required:
+        - userId
+
+    ChatThread:
+      type: object
+      properties:
+        id:
+          type: string
+        user:
+          $ref: "#/components/schemas/UserProfile"
+        lastMessage:
+          type: string
+          nullable: true
+        lastMessageTime:
+          type: string
+          nullable: true
+        unread:
+          type: integer
+        createdAt:
+          type: string
+      required:
+        - id
+        - user
+        - unread
+        - createdAt
+
+    CreateThreadInput:
+      type: object
+      properties:
+        user1Id:
+          type: string
+        user2Id:
+          type: string
+      required:
+        - user1Id
+        - user2Id
+
+    Message:
+      type: object
+      properties:
+        id:
+          type: string
+        threadId:
+          type: string
+        sender:
+          $ref: "#/components/schemas/UserProfile"
+        text:
+          type: string
+        read:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - threadId
+        - sender
+        - text
+        - read
+        - createdAt
+
+    SendMessageInput:
+      type: object
+      properties:
+        senderId:
+          type: string
+        text:
+          type: string
+      required:
+        - senderId
+        - text
+
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        fromUser:
+          $ref: "#/components/schemas/UserProfile"
+        text:
+          type: string
+        read:
+          type: boolean
+        createdAt:
+          type: string
+      required:
+        - id
+        - type
+        - fromUser
+        - text
+        - read
+        - createdAt
