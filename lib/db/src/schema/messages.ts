@@ -3,15 +3,14 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod/v4";
 import { sql } from "drizzle-orm";
 import { profilesTable } from "./profiles";
+import { groupsTable } from "./groups";
 
 export const chatThreadsTable = pgTable("chat_threads", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
-  user1Id: text("user1_id")
-    .notNull()
-    .references(() => profilesTable.id, { onDelete: "cascade" }),
-  user2Id: text("user2_id")
-    .notNull()
-    .references(() => profilesTable.id, { onDelete: "cascade" }),
+  user1Id: text("user1_id").references(() => profilesTable.id, { onDelete: "cascade" }),
+  user2Id: text("user2_id").references(() => profilesTable.id, { onDelete: "cascade" }),
+  groupId: text("group_id").references(() => groupsTable.id, { onDelete: "cascade" }),
+  isGroup: boolean("is_group").notNull().default(false),
   lastMessage: text("last_message").default(""),
   lastMessageTime: timestamp("last_message_time", { withTimezone: true }).defaultNow(),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
@@ -25,7 +24,9 @@ export const messagesTable = pgTable("messages", {
   senderId: text("sender_id")
     .notNull()
     .references(() => profilesTable.id, { onDelete: "cascade" }),
-  text: text("text").notNull(),
+  text: text("text").notNull().default(""),
+  mediaUrl: text("media_url"),
+  mediaType: text("media_type"),
   read: boolean("read").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
 });
@@ -36,9 +37,8 @@ export const notificationsTable = pgTable("notifications", {
     .notNull()
     .references(() => profilesTable.id, { onDelete: "cascade" }),
   type: text("type").notNull(),
-  fromUserId: text("from_user_id")
-    .notNull()
-    .references(() => profilesTable.id, { onDelete: "cascade" }),
+  fromUserId: text("from_user_id").references(() => profilesTable.id, { onDelete: "cascade" }),
+  relatedId: text("related_id"),
   text: text("text").notNull(),
   read: boolean("read").notNull().default(false),
   createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),

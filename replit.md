@@ -1,8 +1,8 @@
-# Workspace
+# Sarykol Connect
 
 ## Overview
 
-pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
+Full-stack social network for Pamir/Sarykol youth community. pnpm workspace monorepo using TypeScript.
 
 ## Stack
 
@@ -12,9 +12,23 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **TypeScript version**: 5.9
 - **API framework**: Express 5
 - **Database**: PostgreSQL + Drizzle ORM
+- **Auth**: JWT (jsonwebtoken) + bcryptjs password hashing
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
-- **API codegen**: Orval (from OpenAPI spec)
+- **Frontend**: React + Vite + Tailwind CSS v4 + wouter routing
+- **File upload**: multer → /tmp/pamir-uploads, served statically
 - **Build**: esbuild (CJS bundle)
+
+## Features
+
+- Real user registration/login (email + password, JWT tokens)
+- Feed with posts, likes, comments
+- Groups with join-request approval flow (creator must approve)
+- Group chats auto-created when group is created, appear in Messages
+- Direct messaging between users
+- Photo/video upload in messages
+- Profile editing with avatar upload
+- Events with participation
+- Leaderboard
 
 ## Structure
 

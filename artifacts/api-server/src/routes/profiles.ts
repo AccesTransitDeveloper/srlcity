@@ -1,27 +1,21 @@
 import { Router, type IRouter } from "express";
 import { db } from "@workspace/db";
 import { profilesTable } from "@workspace/db/schema";
-import { eq, ilike } from "drizzle-orm";
+import { eq, ilike, ne } from "drizzle-orm";
 
 const router: IRouter = Router();
 
+function sanitize(p: typeof profilesTable.$inferSelect) {
+  const { passwordHash, email, ...rest } = p;
+  return rest;
+}
+
 router.get("/profiles", async (req, res) => {
   try {
-    const limit = Number(req.query.limit) || 20;
+    const limit = Number(req.query.limit) || 50;
     const offset = Number(req.query.offset) || 0;
     const profiles = await db.select().from(profilesTable).limit(limit).offset(offset);
-    res.json(profiles);
-  } catch (err) {
-    res.status(500).json({ error: String(err) });
-  }
-});
-
-router.post("/profiles", async (req, res) => {
-  try {
-    const { name, avatarUrl, institution, city, bio, badge } = req.body;
-    if (!name) return res.status(400).json({ error: "name is required" });
-    const [profile] = await db.insert(profilesTable).values({ name, avatarUrl, institution, city, bio, badge }).returning();
-    res.status(201).json(profile);
+    res.json(profiles.map(sanitize));
   } catch (err) {
     res.status(500).json({ error: String(err) });
   }
@@ -31,7 +25,7 @@ router.get("/profiles/:id", async (req, res) => {
   try {
     const [profile] = await db.select().from(profilesTable).where(eq(profilesTable.id, req.params.id));
     if (!profile) return res.status(404).json({ error: "Profile not found" });
-    res.json(profile);
+    res.json(sanitize(profile));
   } catch (err) {
     res.status(500).json({ error: String(err) });
   }
@@ -50,7 +44,7 @@ router.patch("/profiles/:id", async (req, res) => {
     if (rating !== undefined) updates.rating = rating;
     const [profile] = await db.update(profilesTable).set(updates).where(eq(profilesTable.id, req.params.id)).returning();
     if (!profile) return res.status(404).json({ error: "Profile not found" });
-    res.json(profile);
+    res.json(sanitize(profile));
   } catch (err) {
     res.status(500).json({ error: String(err) });
   }
