@@ -56,7 +56,7 @@ const AuthPage = () => {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg">
             <Mountain className="h-8 w-8 text-primary-foreground" />
           </div>
-          <h1 className="font-display text-2xl font-bold text-foreground">Sarykol Connect</h1>
+          <h1 className="font-display text-2xl font-bold text-foreground">SaryKol City</h1>
           <p className="text-sm text-muted-foreground mt-1">Социальная сеть студентов Памира</p>
         </div>
 

@@ -93,7 +93,7 @@ const FeedPage = () => {
     <div className="mx-auto max-w-lg">
       <header className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur px-4 py-3">
         <div className="flex items-center justify-between">
-          <h1 className="font-display text-xl font-bold text-foreground">Sarykol Connect</h1>
+          <h1 className="font-display text-xl font-bold text-foreground">SaryKol City</h1>
           <button className="relative text-muted-foreground">
             <Bell className="h-5 w-5" />
           </button>
