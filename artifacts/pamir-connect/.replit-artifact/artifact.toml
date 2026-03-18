@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Sarykol Connect"
+version = "1.0.0"
+id = "artifacts/pamir-connect"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 25241
+name = "web"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/pamir-connect run dev"
+
+[services.env]
+PORT = "25241"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/pamir-connect", "run", "build"]
+publicDir = "artifacts/pamir-connect/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
