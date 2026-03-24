@@ -48,6 +48,10 @@ export const api = {
     login: (data: { email: string; password: string }) =>
       req<{ token: string; user: any }>("/auth/login", { method: "POST", body: JSON.stringify(data) }),
     me: () => req<any>("/auth/me"),
+    phoneRequest: (phone: string) =>
+      req<{ code: string; isNew: boolean; message: string }>("/auth/phone/request", { method: "POST", body: JSON.stringify({ phone }) }),
+    phoneVerify: (data: { phone: string; code: string; name?: string }) =>
+      req<{ token: string; user: any; isNew: boolean }>("/auth/phone/verify", { method: "POST", body: JSON.stringify(data) }),
   },
   profiles: {
     list: () => req<any[]>("/profiles"),

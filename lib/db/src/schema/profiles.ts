@@ -6,6 +6,7 @@ import { sql } from "drizzle-orm";
 export const profilesTable = pgTable("profiles", {
   id: text("id").primaryKey().default(sql`gen_random_uuid()`),
   email: text("email").unique(),
+  phone: text("phone").unique(),
   passwordHash: text("password_hash"),
   name: text("name").notNull().default(""),
   avatarUrl: text("avatar_url"),
@@ -18,6 +19,14 @@ export const profilesTable = pgTable("profiles", {
   updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
 });
 
+export const phoneOtpsTable = pgTable("phone_otps", {
+  id: text("id").primaryKey().default(sql`gen_random_uuid()`),
+  phone: text("phone").notNull(),
+  code: text("code").notNull(),
+  expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+  createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+});
+
 export const insertProfileSchema = createInsertSchema(profilesTable).omit({
   id: true,
   createdAt: true,
@@ -25,3 +34,4 @@ export const insertProfileSchema = createInsertSchema(profilesTable).omit({
 });
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
 export type Profile = typeof profilesTable.$inferSelect;
+export type PhoneOtp = typeof phoneOtpsTable.$inferSelect;

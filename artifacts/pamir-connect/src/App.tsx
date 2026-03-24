@@ -6,6 +6,7 @@ import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import AppLayout from "@/components/AppLayout";
 import FeedPage from "@/pages/FeedPage";
 import GroupsPage from "@/pages/GroupsPage";
+import EventsPage from "@/pages/EventsPage";
 import RidesPage from "@/pages/RidesPage";
 import MessagesPage from "@/pages/MessagesPage";
 import ProfilePage from "@/pages/ProfilePage";
@@ -41,6 +42,7 @@ const AppRoutes = () => {
       <Switch>
         <Route path="/" component={FeedPage} />
         <Route path="/groups" component={GroupsPage} />
+        <Route path="/events" component={EventsPage} />
         <Route path="/rides" component={RidesPage} />
         <Route path="/messages" component={MessagesPage} />
         <Route path="/profile" component={ProfilePage} />

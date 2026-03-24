@@ -7,6 +7,7 @@ interface AuthContextType {
   loading: boolean;
   signIn: (email: string, password: string) => Promise<void>;
   signUp: (data: { email: string; password: string; name: string; institution?: string; city?: string; bio?: string }) => Promise<void>;
+  signInWithPhone: (token: string, profile: any) => void;
   signOut: () => void;
   updateUser: (data: Partial<UserProfile>) => Promise<void>;
 }
@@ -45,6 +46,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(profile);
   };
 
+  const signInWithPhone = (token: string, profile: any) => {
+    setToken(token);
+    setUser(profile);
+  };
+
   const signOut = () => {
     clearToken();
     setUser(null);
@@ -57,7 +63,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, loading, signIn, signUp, signOut, updateUser }}>
+    <AuthContext.Provider value={{ user, loading, signIn, signUp, signInWithPhone, signOut, updateUser }}>
       {children}
     </AuthContext.Provider>
   );
