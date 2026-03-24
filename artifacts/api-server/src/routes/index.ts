@@ -8,6 +8,7 @@ import eventsRouter from "./events";
 import messagesRouter from "./messages";
 import notificationsRouter from "./notifications";
 import uploadRouter from "./upload";
+import ridesRouter from "./rides";
 
 const router: IRouter = Router();
 
@@ -20,5 +21,6 @@ router.use(eventsRouter);
 router.use(messagesRouter);
 router.use(notificationsRouter);
 router.use(uploadRouter);
+router.use(ridesRouter);
 
 export default router;

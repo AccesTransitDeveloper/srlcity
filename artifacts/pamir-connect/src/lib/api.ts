@@ -95,5 +95,18 @@ export const api = {
     list: (userId: string) => req<any[]>(`/notifications?userId=${userId}`),
     markRead: (id: string) => req<any>(`/notifications/${id}/read`, { method: "PATCH" }),
   },
+  rides: {
+    list: (params?: { driverId?: string; status?: string }) => {
+      const qs = new URLSearchParams();
+      if (params?.driverId) qs.set("driverId", params.driverId);
+      if (params?.status) qs.set("status", params.status);
+      const q = qs.toString();
+      return req<any[]>(`/rides${q ? `?${q}` : ""}`);
+    },
+    get: (id: string) => req<any>(`/rides/${id}`),
+    create: (data: any) => req<any>("/rides", { method: "POST", body: JSON.stringify(data) }),
+    cancel: (id: string, driverId: string) => req<any>(`/rides/${id}/cancel`, { method: "PATCH", body: JSON.stringify({ driverId }) }),
+    delete: (id: string, driverId: string) => req<void>(`/rides/${id}`, { method: "DELETE", body: JSON.stringify({ driverId }) }),
+  },
   upload,
 };
