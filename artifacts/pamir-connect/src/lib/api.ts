@@ -54,8 +54,15 @@ export const api = {
       req<{ token: string; user: any; isNew: boolean }>("/auth/phone/verify", { method: "POST", body: JSON.stringify(data) }),
   },
   profiles: {
-    list: () => req<any[]>("/profiles"),
+    list: (params?: { search?: string }) => {
+      const qs = new URLSearchParams();
+      if (params?.search) qs.set("search", params.search);
+      const q = qs.toString();
+      return req<any[]>(`/profiles${q ? `?${q}` : ""}`);
+    },
     get: (id: string) => req<any>(`/profiles/${id}`),
+    stats: (id: string) => req<{ posts: number; events: number; groups: number; rides: number }>(`/profiles/${id}/stats`),
+    leaderboard: (limit = 20) => req<any[]>(`/profiles/leaderboard?limit=${limit}`),
     update: (id: string, data: any) => req<any>(`/profiles/${id}`, { method: "PATCH", body: JSON.stringify(data) }),
   },
   posts: {
@@ -84,8 +91,17 @@ export const api = {
       req<any>(`/groups/${groupId}/requests/${requestId}`, { method: "PATCH", body: JSON.stringify({ action }) }),
   },
   events: {
-    list: (userId?: string) => req<any[]>(`/events${userId ? `?userId=${userId}` : ""}`),
+    list: (userId?: string, filter?: string, search?: string) => {
+      const qs = new URLSearchParams();
+      if (userId) qs.set("userId", userId);
+      if (filter) qs.set("filter", filter);
+      if (search) qs.set("search", search);
+      const q = qs.toString();
+      return req<any[]>(`/events${q ? `?${q}` : ""}`);
+    },
+    get: (id: string, userId?: string) => req<any>(`/events/${id}${userId ? `?userId=${userId}` : ""}`),
     create: (data: any) => req<any>("/events", { method: "POST", body: JSON.stringify(data) }),
+    delete: (id: string, userId: string) => req<void>(`/events/${id}`, { method: "DELETE", body: JSON.stringify({ userId }) }),
     participate: (id: string, userId: string) => req<any>(`/events/${id}/participate`, { method: "POST", body: JSON.stringify({ userId }) }),
     cancel: (id: string, userId: string) => req<any>(`/events/${id}/participate`, { method: "DELETE", body: JSON.stringify({ userId }) }),
   },
