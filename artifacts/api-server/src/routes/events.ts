@@ -83,9 +83,9 @@ router.get("/events", async (req, res) => {
 
     const events = await query.limit(limit).offset(offset);
     const enriched = await Promise.all(events.map((e) => enrichEvent(e, userId)));
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -106,9 +106,9 @@ router.post("/events", async (req, res) => {
     }
 
     const enriched = await enrichEvent(event, ownerId);
-    res.status(201).json(enriched);
+    return res.status(201).json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -136,9 +136,9 @@ router.delete("/events/:id", async (req, res) => {
     if (event.createdBy !== ownerId) return res.status(403).json({ error: "Нет прав для удаления" });
 
     await db.delete(eventsTable).where(eq(eventsTable.id, req.params.id));
-    res.status(204).end();
+    return res.status(204).end();
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -150,9 +150,9 @@ router.post("/events/:id/participate", async (req, res) => {
     const [event] = await db.select().from(eventsTable).where(eq(eventsTable.id, req.params.id));
     if (!event) return res.status(404).json({ error: "Событие не найдено" });
     const enriched = await enrichEvent(event, userId);
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -165,9 +165,9 @@ router.delete("/events/:id/participate", async (req, res) => {
     if (event.createdBy === userId) return res.status(400).json({ error: "Создатель не может покинуть событие" });
     await db.delete(eventParticipantsTable).where(and(eq(eventParticipantsTable.eventId, req.params.id), eq(eventParticipantsTable.userId, userId)));
     const enriched = await enrichEvent(event, userId);
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 

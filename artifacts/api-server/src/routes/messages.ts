@@ -65,9 +65,9 @@ router.get("/threads", async (req, res) => {
     const all = [...directThreads, ...groupThreads];
     const enriched = await Promise.all(all.map((t) => enrichThread(t, userId)));
     enriched.sort((a, b) => new Date(b.lastMessageTime || 0).getTime() - new Date(a.lastMessageTime || 0).getTime());
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -90,9 +90,9 @@ router.post("/threads", async (req, res) => {
     }
     const [thread] = await db.insert(chatThreadsTable).values({ user1Id, user2Id, isGroup: false }).returning();
     const enriched = await enrichThread(thread, user1Id);
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -113,9 +113,9 @@ router.get("/threads/:id/messages", async (req, res) => {
         return { id: m.id, threadId: m.threadId, sender: safeSender || null, text: m.text, mediaUrl: m.mediaUrl, mediaType: m.mediaType, read: m.read, createdAt: m.createdAt };
       })
     );
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -138,9 +138,9 @@ router.post("/threads/:id/messages", async (req, res) => {
 
     const [sender] = await db.select().from(profilesTable).where(eq(profilesTable.id, senderId));
     const { passwordHash, ...safeSender } = sender || ({} as any);
-    res.status(201).json({ id: msg.id, threadId: msg.threadId, sender: safeSender || null, text: msg.text, mediaUrl: msg.mediaUrl, mediaType: msg.mediaType, read: msg.read, createdAt: msg.createdAt });
+    return res.status(201).json({ id: msg.id, threadId: msg.threadId, sender: safeSender || null, text: msg.text, mediaUrl: msg.mediaUrl, mediaType: msg.mediaType, read: msg.read, createdAt: msg.createdAt });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 

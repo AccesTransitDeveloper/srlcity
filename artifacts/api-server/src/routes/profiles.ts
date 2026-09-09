@@ -44,9 +44,9 @@ router.get("/profiles", async (req, res) => {
     }
     query = query.orderBy(desc(profilesTable.rating)).limit(limit).offset(offset);
     const profiles = await query;
-    res.json(profiles.map(p => sanitize(p)));
+    return res.json(profiles.map(p => sanitize(p)));
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -56,9 +56,9 @@ router.get("/profiles/leaderboard", async (req, res) => {
     const profiles = await db.select().from(profilesTable)
       .orderBy(desc(profilesTable.rating))
       .limit(limit);
-    res.json(profiles.map(p => sanitize(p)));
+    return res.json(profiles.map(p => sanitize(p)));
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -79,8 +79,14 @@ router.get("/profiles/:id/stats", async (req, res) => {
       groups: Number(groupCount[0]?.count || 0),
       rides: Number(rideCount[0]?.count || 0),
     });
+    return res.json({
+      posts: Number(postCount[0]?.count || 0),
+      events: Number(eventCount[0]?.count || 0),
+      groups: Number(groupCount[0]?.count || 0),
+      rides: Number(rideCount[0]?.count || 0),
+    });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -90,9 +96,9 @@ router.get("/profiles/:id", async (req, res) => {
     const [profile] = await db.select().from(profilesTable).where(eq(profilesTable.id, req.params.id));
     if (!profile) return res.status(404).json({ error: "Профиль не найден" });
     const isSelf = authUserId === profile.id;
-    res.json(sanitize(profile, isSelf));
+    return res.json(sanitize(profile, isSelf));
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -115,9 +121,9 @@ router.patch("/profiles/:id", async (req, res) => {
 
     const [profile] = await db.update(profilesTable).set(updates).where(eq(profilesTable.id, req.params.id)).returning();
     if (!profile) return res.status(404).json({ error: "Профиль не найден" });
-    res.json(sanitize(profile, true));
+    return res.json(sanitize(profile, true));
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 

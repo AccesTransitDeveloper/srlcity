@@ -40,9 +40,9 @@ router.get("/rides", async (req, res) => {
     }
 
     const enriched = await Promise.all(rows.map(enrichRide));
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -75,9 +75,9 @@ router.post("/rides", async (req, res) => {
     }).returning();
 
     const enriched = await enrichRide(ride);
-    res.status(201).json(enriched);
+    return res.status(201).json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -86,9 +86,9 @@ router.get("/rides/:id", async (req, res) => {
     const [ride] = await db.select().from(ridesTable).where(eq(ridesTable.id, req.params.id));
     if (!ride) return res.status(404).json({ error: "Маршрут не найден" });
     const enriched = await enrichRide(ride);
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -102,9 +102,9 @@ router.patch("/rides/:id/cancel", async (req, res) => {
       .returning();
     if (!ride) return res.status(404).json({ error: "Маршрут не найден" });
     const enriched = await enrichRide(ride);
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -112,9 +112,9 @@ router.delete("/rides/:id", async (req, res) => {
   try {
     const { driverId } = req.body;
     await db.delete(ridesTable).where(and(eq(ridesTable.id, req.params.id), eq(ridesTable.driverId, driverId)));
-    res.status(204).send();
+    return res.status(204).send();
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 

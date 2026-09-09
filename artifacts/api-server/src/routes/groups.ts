@@ -50,9 +50,9 @@ router.get("/groups", async (req, res) => {
       groups = await db.select().from(groupsTable).limit(limit).offset(offset);
     }
     const enriched = await Promise.all(groups.map((g) => enrichGroup(g, userId)));
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -71,9 +71,9 @@ router.post("/groups", async (req, res) => {
     const [updated] = await db.update(groupsTable).set({ chatThreadId: thread.id }).where(eq(groupsTable.id, group.id)).returning();
 
     const enriched = await enrichGroup(updated, createdBy);
-    res.status(201).json(enriched);
+    return res.status(201).json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -83,9 +83,9 @@ router.get("/groups/:id", async (req, res) => {
     const [group] = await db.select().from(groupsTable).where(eq(groupsTable.id, req.params.id));
     if (!group) return res.status(404).json({ error: "Group not found" });
     const enriched = await enrichGroup(group, userId);
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -113,9 +113,9 @@ router.post("/groups/:id/request", async (req, res) => {
 
     const [request] = await db.insert(groupJoinRequestsTable).values({ groupId: req.params.id, userId }).returning();
     const enriched = await enrichGroup(group, userId);
-    res.status(201).json({ ...enriched, request });
+    return res.status(201).json({ ...enriched, request });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -133,9 +133,9 @@ router.get("/groups/:id/requests", async (req, res) => {
         return { ...r, user: safeUser };
       })
     );
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -160,9 +160,9 @@ router.patch("/groups/:id/requests/:requestId", async (req, res) => {
       await db.update(groupsTable).set({ memberCount: Number(count) }).where(eq(groupsTable.id, req.params.id));
     }
 
-    res.json(request);
+    return res.json(request);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -175,9 +175,9 @@ router.delete("/groups/:id/leave", async (req, res) => {
     const [group] = await db.update(groupsTable).set({ memberCount: Number(count) }).where(eq(groupsTable.id, req.params.id)).returning();
     if (!group) return res.status(404).json({ error: "Group not found" });
     const enriched = await enrichGroup(group, userId);
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 

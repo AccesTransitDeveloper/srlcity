@@ -44,9 +44,9 @@ router.get("/posts", async (req, res) => {
     let query = db.select().from(postsTable).orderBy(desc(postsTable.createdAt)).limit(limit).offset(offset);
     const posts = await query;
     const enriched = await Promise.all(posts.map((p) => enrichPost(p, userId)));
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -63,9 +63,9 @@ router.post("/posts", async (req, res) => {
       groupId,
     }).returning();
     const enriched = await enrichPost(post, authorId);
-    res.status(201).json(enriched);
+    return res.status(201).json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -75,18 +75,18 @@ router.get("/posts/:id", async (req, res) => {
     const [post] = await db.select().from(postsTable).where(eq(postsTable.id, req.params.id));
     if (!post) return res.status(404).json({ error: "Post not found" });
     const enriched = await enrichPost(post, userId);
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
 router.delete("/posts/:id", async (req, res) => {
   try {
     await db.delete(postsTable).where(eq(postsTable.id, req.params.id));
-    res.status(204).send();
+    return res.status(204).send();
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -99,9 +99,9 @@ router.post("/posts/:id/likes", async (req, res) => {
       .select({ count: sql<number>`count(*)` })
       .from(likesTable)
       .where(eq(likesTable.postId, req.params.id));
-    res.json({ likes: Number(count), liked: true });
+    return res.json({ likes: Number(count), liked: true });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -114,9 +114,9 @@ router.delete("/posts/:id/likes", async (req, res) => {
       .select({ count: sql<number>`count(*)` })
       .from(likesTable)
       .where(eq(likesTable.postId, req.params.id));
-    res.json({ likes: Number(count), liked: false });
+    return res.json({ likes: Number(count), liked: false });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -129,9 +129,9 @@ router.get("/posts/:id/comments", async (req, res) => {
         return { id: c.id, author: author || null, text: c.text, createdAt: c.createdAt };
       })
     );
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -141,9 +141,9 @@ router.post("/posts/:id/comments", async (req, res) => {
     if (!authorId || !text) return res.status(400).json({ error: "authorId and text are required" });
     const [comment] = await db.insert(commentsTable).values({ postId: req.params.id, authorId, text }).returning();
     const [author] = await db.select().from(profilesTable).where(eq(profilesTable.id, authorId));
-    res.status(201).json({ id: comment.id, author: author || null, text: comment.text, createdAt: comment.createdAt });
+    return res.status(201).json({ id: comment.id, author: author || null, text: comment.text, createdAt: comment.createdAt });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 

@@ -16,9 +16,9 @@ router.get("/notifications", async (req, res) => {
         return { id: n.id, type: n.type, fromUser: fromUser || null, text: n.text, read: n.read, createdAt: n.createdAt };
       })
     );
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -31,9 +31,9 @@ router.patch("/notifications/:id/read", async (req, res) => {
       .returning();
     if (!notification) return res.status(404).json({ error: "Notification not found" });
     const [fromUser] = await db.select().from(profilesTable).where(eq(profilesTable.id, notification.fromUserId));
-    res.json({ id: notification.id, type: notification.type, fromUser: fromUser || null, text: notification.text, read: notification.read, createdAt: notification.createdAt });
+    return res.json({ id: notification.id, type: notification.type, fromUser: fromUser || null, text: notification.text, read: notification.read, createdAt: notification.createdAt });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
