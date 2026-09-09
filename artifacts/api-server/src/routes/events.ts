@@ -118,9 +118,9 @@ router.get("/events/:id", async (req, res) => {
     const [event] = await db.select().from(eventsTable).where(eq(eventsTable.id, req.params.id));
     if (!event) return res.status(404).json({ error: "Событие не найдено" });
     const enriched = await enrichEvent(event, userId);
-    res.json(enriched);
+    return res.json(enriched);
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
