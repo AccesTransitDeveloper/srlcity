@@ -57,8 +57,8 @@ const EditProfileModal = ({ onClose }: { onClose: () => void }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 backdrop-blur-sm" onClick={onClose}>
-      <div className="w-full max-w-sm rounded-2xl bg-card p-5 shadow-xl max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 pb-24 backdrop-blur-sm" onClick={onClose}>
+      <div className="w-full max-w-sm rounded-2xl bg-card p-5 shadow-xl max-h-[calc(100vh-8rem)] overflow-y-auto overscroll-contain" onClick={e => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-5">
           <h2 className="font-display font-bold text-base text-foreground">Редактировать профиль</h2>
           <button onClick={onClose} className="text-muted-foreground"><X className="h-5 w-5" /></button>

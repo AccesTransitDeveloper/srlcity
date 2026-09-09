@@ -53,8 +53,15 @@ router.get("/posts", async (req, res) => {
 router.post("/posts", async (req, res) => {
   try {
     const { authorId, content, imageUrl, groupId } = req.body;
-    if (!authorId || !content) return res.status(400).json({ error: "authorId and content are required" });
-    const [post] = await db.insert(postsTable).values({ authorId, content, imageUrl, groupId }).returning();
+    if (!authorId || (!content && !imageUrl)) return res.status(400).json({ error: "authorId and content or imageUrl are required" });
+    const caption = typeof content === "string" ? content.trim() : "";
+    const fallbackCaption = imageUrl ? "Фото / видео" : "";
+    const [post] = await db.insert(postsTable).values({
+      authorId,
+      content: caption || fallbackCaption || content,
+      imageUrl,
+      groupId,
+    }).returning();
     const enriched = await enrichPost(post, authorId);
     res.status(201).json(enriched);
   } catch (err) {

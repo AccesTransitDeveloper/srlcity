@@ -13,6 +13,10 @@ function getAvatar(p: { avatarUrl?: string | null; avatar?: string }) {
   return p.avatarUrl || p.avatar || `https://api.dicebear.com/7.x/avataaars/svg?seed=${p.avatarUrl}`;
 }
 
+function isVideoUrl(url: string) {
+  return /\.(mp4|webm|mov)(\?|#|$)/i.test(url);
+}
+
 const PostCard = ({ post }: PostCardProps) => {
   const { user } = useAuth();
   const [liked, setLiked] = useState(post.liked);
@@ -83,7 +87,11 @@ const PostCard = ({ post }: PostCardProps) => {
 
       {image && (
         <div className="mb-3 overflow-hidden rounded-lg">
-          <img src={image} alt="" className="w-full h-48 object-cover bg-muted" loading="lazy" />
+          {isVideoUrl(image) ? (
+            <video src={image} controls playsInline className="w-full h-56 object-cover bg-black" />
+          ) : (
+            <img src={image} alt="" className="w-full h-48 object-cover bg-muted" loading="lazy" />
+          )}
         </div>
       )}
 

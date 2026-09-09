@@ -98,3 +98,15 @@ export interface Notification {
   read: boolean;
   createdAt: string;
 }
+
+export interface MarketplaceProduct {
+  id: string;
+  title: string;
+  price: string;
+  description?: string | null;
+  category?: string | null;
+  imageUrl?: string | null;
+  sellerName: string;
+  sellerId?: string;
+  createdAt: string;
+}

@@ -1,4 +1,27 @@
-import app from "./app";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const envPaths = [
+  path.resolve(process.cwd(), ".env"),
+  path.resolve(__dirname, "..", ".env"),
+  path.resolve(__dirname, "..", "..", "..", ".env"),
+];
+
+for (const envPath of envPaths) {
+  try {
+    process.loadEnvFile?.(envPath);
+  } catch (error) {
+    const code = (error as NodeJS.ErrnoException).code;
+    if (code !== "ENOENT") {
+      throw error;
+    }
+  }
+}
+
+const { default: app } = await import("./app");
 
 const rawPort = process.env["PORT"];
 

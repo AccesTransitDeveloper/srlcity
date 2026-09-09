@@ -1,11 +1,11 @@
 import { ReactNode } from "react";
 import { useLocation } from "wouter";
-import { Home, Users, Car, CalendarDays, MessageCircle, User } from "lucide-react";
+import { Home, Users, Car, ShoppingBag, MessageCircle, User } from "lucide-react";
 
 const navItems = [
   { path: "/", icon: Home, label: "Лента" },
   { path: "/groups", icon: Users, label: "Группы" },
-  { path: "/events", icon: CalendarDays, label: "События" },
+  { path: "/marketplace", icon: ShoppingBag, label: "Маркет" },
   { path: "/rides", icon: Car, label: "Такси" },
   { path: "/messages", icon: MessageCircle, label: "Чат" },
   { path: "/profile", icon: User, label: "Профиль" },
