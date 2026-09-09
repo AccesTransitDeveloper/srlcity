@@ -21,22 +21,27 @@ for (const envPath of envPaths) {
   }
 }
 
-const { default: app } = await import("./app");
+(async () => {
+  const { default: app } = await import("./app");
 
-const rawPort = process.env["PORT"];
+  const rawPort = process.env["PORT"];
 
-if (!rawPort) {
-  throw new Error(
-    "PORT environment variable is required but was not provided.",
-  );
-}
+  if (!rawPort) {
+    throw new Error(
+      "PORT environment variable is required but was not provided.",
+    );
+  }
 
-const port = Number(rawPort);
+  const port = Number(rawPort);
 
-if (Number.isNaN(port) || port <= 0) {
-  throw new Error(`Invalid PORT value: "${rawPort}"`);
-}
+  if (Number.isNaN(port) || port <= 0) {
+    throw new Error(`Invalid PORT value: "${rawPort}"`);
+  }
 
-app.listen(port, () => {
-  console.log(`Server listening on port ${port}`);
+  app.listen(port, () => {
+    console.log(`Server listening on port ${port}`);
+  });
+})().catch((err) => {
+  console.error("Failed to start server:", err);
+  process.exit(1);
 });
