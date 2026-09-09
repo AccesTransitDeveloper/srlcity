@@ -42,9 +42,9 @@ router.post("/auth/register", async (req, res) => {
       .values({ email: email.toLowerCase().trim(), passwordHash, name: name.trim(), institution, city, bio })
       .returning();
     const token = makeToken(profile.id);
-    res.status(201).json({ token, user: sanitize(profile) });
+    return res.status(201).json({ token, user: sanitize(profile) });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -63,9 +63,9 @@ router.post("/auth/login", async (req, res) => {
       return res.status(401).json({ error: "Неверный email или пароль" });
     }
     const token = makeToken(profile.id);
-    res.json({ token, user: sanitize(profile) });
+    return res.json({ token, user: sanitize(profile) });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -77,9 +77,9 @@ router.get("/auth/me", async (req, res) => {
     const payload = jwt.verify(token, JWT_SECRET) as { sub: string };
     const [profile] = await db.select().from(profilesTable).where(eq(profilesTable.id, payload.sub));
     if (!profile) return res.status(404).json({ error: "User not found" });
-    res.json(sanitize(profile));
+    return res.json(sanitize(profile));
   } catch {
-    res.status(401).json({ error: "Invalid token" });
+    return res.status(401).json({ error: "Invalid token" });
   }
 });
 
@@ -99,9 +99,9 @@ router.post("/auth/phone/request", async (req, res) => {
     const existing = await db.select().from(profilesTable).where(eq(profilesTable.phone, normalized));
     const isNew = existing.length === 0;
 
-    res.json({ code, isNew, message: `Код: ${code}` });
+    return res.json({ code, isNew, message: `Код: ${code}` });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
@@ -142,9 +142,9 @@ router.post("/auth/phone/verify", async (req, res) => {
     }
 
     const token = makeToken(profile.id);
-    res.json({ token, user: sanitize(profile), isNew: existing.length === 0 });
+    return res.json({ token, user: sanitize(profile), isNew: existing.length === 0 });
   } catch (err) {
-    res.status(500).json({ error: String(err) });
+    return res.status(500).json({ error: String(err) });
   }
 });
 
