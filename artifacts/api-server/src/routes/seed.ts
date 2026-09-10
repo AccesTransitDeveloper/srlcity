@@ -80,12 +80,6 @@ router.post("/seed", async (_req, res) => {
       { groupId: groups[1].id, userId: rustam.id },
     ]);
 
-    for (const g of groups) {
-      const members = await db.select().from(groupMembersTable).where(groupMembersTable.groupId === g.id ? undefined : undefined);
-      const count = await db.$count(groupMembersTable);
-      await db.update(groupsTable).set({ memberCount: count }).where(groupsTable.id === g.id ? undefined : undefined);
-    }
-
     await db.execute(`
       UPDATE groups SET member_count = (SELECT COUNT(*) FROM group_members WHERE group_id = groups.id)
     `);

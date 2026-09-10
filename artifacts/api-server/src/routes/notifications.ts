@@ -12,7 +12,9 @@ router.get("/notifications", async (req, res) => {
     const notifications = await db.select().from(notificationsTable).where(eq(notificationsTable.userId, userId));
     const enriched = await Promise.all(
       notifications.map(async (n) => {
-        const [fromUser] = await db.select().from(profilesTable).where(eq(profilesTable.id, n.fromUserId));
+        const [fromUser] = n.fromUserId
+          ? await db.select().from(profilesTable).where(eq(profilesTable.id, n.fromUserId))
+          : [null];
         return { id: n.id, type: n.type, fromUser: fromUser || null, text: n.text, read: n.read, createdAt: n.createdAt };
       })
     );
@@ -30,7 +32,9 @@ router.patch("/notifications/:id/read", async (req, res) => {
       .where(eq(notificationsTable.id, req.params.id))
       .returning();
     if (!notification) return res.status(404).json({ error: "Notification not found" });
-    const [fromUser] = await db.select().from(profilesTable).where(eq(profilesTable.id, notification.fromUserId));
+    const [fromUser] = notification.fromUserId
+      ? await db.select().from(profilesTable).where(eq(profilesTable.id, notification.fromUserId))
+      : [null];
     return res.json({ id: notification.id, type: notification.type, fromUser: fromUser || null, text: notification.text, read: notification.read, createdAt: notification.createdAt });
   } catch (err) {
     return res.status(500).json({ error: String(err) });
