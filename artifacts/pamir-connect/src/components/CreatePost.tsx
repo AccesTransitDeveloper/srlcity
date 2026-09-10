@@ -99,9 +99,10 @@ const CreatePost = ({ avatar, onPost }: CreatePostProps) => {
         accept="image/*,video/*"
         className="hidden"
         onChange={async (e) => {
-          const file = e.target.files?.[0];
+          const input = e.currentTarget;
+          const file = input.files?.[0];
+          input.value = "";
           if (file) await handleFile(file);
-          e.currentTarget.value = "";
         }}
       />
     </div>

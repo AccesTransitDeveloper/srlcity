@@ -111,7 +111,7 @@ const AddProductModal = ({
                 <span>{uploading ? "Загрузка..." : "Загрузить фото"}</span>
               </button>
             )}
-            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={async (e) => { const file = e.target.files?.[0]; if (file) await handleUpload(file); e.currentTarget.value = ""; }} />
+            <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={async (e) => { const input = e.currentTarget; const file = input.files?.[0]; input.value = ""; if (file) await handleUpload(file); }} />
           </div>
 
           <div>
