@@ -73,12 +73,6 @@ router.get("/profiles/:id/stats", async (req, res) => {
       db.select({ count: sql<number>`count(*)` }).from(ridesTable).where(eq(ridesTable.driverId, id)),
     ]);
 
-    res.json({
-      posts: Number(postCount[0]?.count || 0),
-      events: Number(eventCount[0]?.count || 0),
-      groups: Number(groupCount[0]?.count || 0),
-      rides: Number(rideCount[0]?.count || 0),
-    });
     return res.json({
       posts: Number(postCount[0]?.count || 0),
       events: Number(eventCount[0]?.count || 0),
